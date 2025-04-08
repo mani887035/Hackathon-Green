@@ -1,0 +1,48 @@
+import random
+import time
+import subprocess
+import json
+
+# Simulate Air Quality Data
+def get_air_quality_data():
+    return {
+        "PM2.5": random.randint(50, 400),
+        "PM10": random.randint(80, 500),
+        "CO": round(random.uniform(0.5, 4.0), 2),
+        "NO2": round(random.uniform(10, 200), 2)
+    }
+
+# Use Ollama LLM locally to make a decision
+def query_ollama_model(aqi_data):
+    prompt = f"""Air Quality Data: {json.dumps(aqi_data)}
+Should we activate the turbine and vacuum system? Respond with YES or NO and a reason.
+"""
+    result = subprocess.run(
+        ["ollama", "run", "llama2", prompt],
+        capture_output=True,
+        text=True
+    )
+    return result.stdout.strip()
+
+# Simulate activation system
+def activate_system():
+    print("🌀 Turbine ON\n🧹 Vacuum Pump ON\n✅ Air Filtration Active")
+
+# Main loop
+if __name__ == "__main__":
+    print("🌍 GREEN AIR MISSION - Smog Stoppers AI System Running...\n")
+
+    while True:
+        aqi = get_air_quality_data()
+        print(f"📊 Current AQI Data: {aqi}")
+
+        decision = query_ollama_model(aqi)
+        print(f"🤖 AI Decision: {decision}")
+
+        if "YES" in decision.upper():
+            activate_system()
+        else:
+            print("🛑 System Idle - Air quality under control.")
+
+        print("\n⏳ Waiting for next reading...\n")
+        time.sleep(10)
